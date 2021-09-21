@@ -57,6 +57,12 @@ def Get_Root_Node(data, total_entropy):
     return root_node, best_info_gain
 
 def Recursive_ID3(data, total_entropy):
+    #Part 1, checking if all labels are the same
+    if len(data.unique(data['label'])) == 1:
+        return Node(label=data.unique(data['label'])[0])
+    #Check if there are no more attributes to look on
+    if data.shape[1] == 1:
+        return Node(label= Get_Most_Common_Label(data))
     #This is for part 2 in the method
     #Using a tuple we can get both the root node and its corresponding info gain, which we will call new_entropy
     root_node, new_entropy = Get_Root_Node(data,total_entropy)
@@ -68,6 +74,7 @@ def Recursive_ID3(data, total_entropy):
         #Check to see if Sv is empty
         if len(value_subset.index) == 0:
             leaf_node = Node(label= Get_Most_Common_Label(data))
+            root_node.next = leaf_node
         root_node.next = Recursive_ID3(value_subset,new_entropy)
     return root_node
 
@@ -84,9 +91,9 @@ def main():
     total_entropy = 0
     for value in total_label_values:
        total_entropy += Calc_Entropy(value, num_rows)
-    print(total_entropy)
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
-
+    root_node = Recursive_ID3(data, total_entropy)
+    
 if __name__ == "__main__":
     main()
 
