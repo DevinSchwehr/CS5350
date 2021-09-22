@@ -9,7 +9,7 @@ class Node:
     def __init__(self, attribute=None, values=None, label=None):
         self.attribute = attribute
         self.values = values
-        self.next = []
+        self.next = {}
         #This is for leaf nodes
         self.label = label
 
@@ -128,7 +128,7 @@ def Get_Root_Node_Majority(data,attributes, total_majority):
 
 
 def Recursive_ID3(data, attributes, total_entropy, defined_depth, decider):
-    if defined_depth < 0:
+    if defined_depth == 0:
         return Node(label = Get_Most_Common_Label(data))
     #Part 1, checking if all labels are the same
     if len(pd.unique(data['label'])) == 1:
@@ -153,14 +153,26 @@ def Recursive_ID3(data, attributes, total_entropy, defined_depth, decider):
         #Check to see if Sv is empty
         length = len(value_subset.index)
         if length == 0:
-            leaf_node = Node(label= Get_Most_Common_Label(data))
-            root_node.next.append(leaf_node)
+            return Node(label= Get_Most_Common_Label(data))
         else:
             new_attributes = attributes[:]
             new_attributes.remove(root_node.attribute)
             new_depth = defined_depth -1
-            root_node.next.append(Recursive_ID3(value_subset, new_attributes , new_error, new_depth, decider))
+            # root_node.next.append(Recursive_ID3(value_subset, new_attributes , new_error, new_depth, decider))
+            root_node.next[value] = Recursive_ID3(value_subset,new_attributes, new_error, new_depth, decider)
     return root_node
+
+def Calculate_Accuracy(root_node, data):
+    wrong_predictions = 0
+    i = 0
+    while i < data.shape[0]:
+        current_node = root_node
+        while current_node.label == None:
+            current_node = current_node.next[data[current_node.attribute].iloc[i]]
+        if current_node.label != data['label'].iloc[i]:
+            wrong_predictions += 1
+        i += 1
+    return wrong_predictions/data.shape[0]
 
 def main():
     print('Please Input the Tree Depth')
@@ -169,19 +181,22 @@ def main():
     decider = int(input())
     #Goal is to use Pandas to generate the table.
     car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
-    q1_cols = ['x1','x2','x3','x4','label']
-    # data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
-    data = pd.read_csv(r"DecisionTree\Q1_data.csv", header=None, names=q1_cols, delimiter=',')
+    # q1_cols = ['x1','x2','x3','x4','label']
+    data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
+    # data = pd.read_csv(r"DecisionTree\Q1_data.csv", header=None, names=q1_cols, delimiter=',')
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
     total_label_values = data['label'].value_counts()
     total_error = Get_Total_Value(total_label_values, num_rows, decider)
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
-    # car_cols.remove('label')
-    q1_cols.remove('label')
-    # root_node = Recursive_ID3(data, car_cols, total_entropy, tree_depth)
-    root_node = Recursive_ID3(data, q1_cols, total_error, tree_depth, decider)
-    print('program finished with depth of ' + str(tree_depth))
+    car_cols.remove('label')
+    # q1_cols.remove('label')
+    root_node = Recursive_ID3(data, car_cols, total_error, tree_depth, decider)
+    # root_node = Recursive_ID3(data, q1_cols, total_error, tree_depth, decider)
+
+    #Now that we have the root node, we can calculate the accuracy of the tree
+    error = Calculate_Accuracy(root_node, data)
+    print('program finished with depth of ' + str(tree_depth) + ' and error of ' + str(error))
 
 if __name__ == "__main__":
     main()
