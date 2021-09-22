@@ -21,6 +21,9 @@ def Calc_Entropy(values, size):
 def Calc_Gini(probability, size):
     return np.power(probability/size,2)
 
+def Calc_Majority(probability, size):
+    return (size-probability)/size
+
 def Info_Gain(total, s_size, value_numbers, calculations):
     summation = 0
     i = 0
@@ -45,7 +48,8 @@ def Get_Total_Value(label_values,num_rows,decider):
         return total_value
     if decider == 3:
         total_value = 0
-        # for value in label_values
+        for value in label_values:
+            total_value += (num_rows-value)/num_rows
         return total_value
 
 
@@ -111,7 +115,7 @@ def Get_Root_Node_Majority(data,attributes, total_majority):
                 label_counts = filtered_data['label'].value_counts()
                 value_majority = 1
                 for label in label_counts:
-                    value_majority -= Calc_Gini(label, filtered_data.shape[0])
+                    value_majority += Calc_Majority(label, filtered_data.shape[0])
                 majority_errors.append(value_majority)
             attribute_info_gain = Info_Gain(total_majority, data.shape[0], data[attribute].value_counts(), majority_errors)
             if best_info_gain == None or attribute_info_gain > best_info_gain:
