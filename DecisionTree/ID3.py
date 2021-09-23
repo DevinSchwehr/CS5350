@@ -147,8 +147,7 @@ def Recursive_ID3(data, attributes, total_entropy, defined_depth, decider):
     if decider == 3:
         root_node, new_error = Get_Root_Node_Majority(data, attributes, total_entropy)
     for value in attribute_value_dictionary[root_node.attribute]:
-        #First get all rows that contain that attribute value
-        #Remove the Attribute from the list to get Sv
+        #get all rows that contain that attribute value
         is_val = data[root_node.attribute] == value
         value_subset = data[is_val]
         #Check to see if Sv is empty
@@ -170,14 +169,7 @@ def Calculate_Accuracy(root_node, data):
     while i < data.shape[0]:
         current_node = root_node
         while current_node.label == None:
-            current_row = data.loc[i]
             current_node = current_node.next[data[current_node.attribute].iloc[i]]
-
-            # try:
-            #     current_node = current_node.next[data[current_node.attribute].iloc[i]]
-            # except KeyError:
-            #     wrong_predictions += 1
-            #     break
         if current_node.label != data['label'].iloc[i]:
             wrong_predictions += 1
         i += 1
@@ -192,24 +184,22 @@ def main():
     tree_depth = int(input())
     print('Please Input how you want to select the attribute. 1=Entropy, 2=Gini, 3=Majority')
     decider = int(input())
+
     #Goal is to use Pandas to generate the table.
     car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
-    # q1_cols = ['x1','x2','x3','x4','label']
     data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
     test_data = pd.read_csv(r"DecisionTree\test.csv", header=None, names=car_cols, delimiter=',')
-    # data = pd.read_csv(r"DecisionTree\Q1_data.csv", header=None, names=q1_cols, delimiter=',')
+
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
     total_label_values = data['label'].value_counts()
     total_error = Get_Total_Value(total_label_values, num_rows, decider)
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
     car_cols.remove('label')
-    # q1_cols.remove('label')
 
     #we have to populate our global dictionary
     Populate_Global_Dictionary(data, car_cols)
     root_node = Recursive_ID3(data, car_cols, total_error, tree_depth, decider)
-    # root_node = Recursive_ID3(data, q1_cols, total_error, tree_depth, decider)
 
     #Now that we have the root node, we can calculate the accuracy of the tree
     train_error = Calculate_Accuracy(root_node, data)

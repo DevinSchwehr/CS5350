@@ -2,6 +2,8 @@
 import numpy as np
 import pandas as pd
 
+attribute_value_dictionary = {}
+
 def Get_Num_Values(dataframe, value):
     return dataframe.loc[dataframe['label'] == value].count()
 
@@ -144,16 +146,15 @@ def Recursive_ID3(data, attributes, total_entropy, defined_depth, decider):
         root_node, new_error = Get_Root_Node_Gini(data, attributes, total_entropy)
     if decider == 3:
         root_node, new_error = Get_Root_Node_Majority(data, attributes, total_entropy)
-    for value in root_node.values:
-        #First get all rows that contain that attribute value
-        # value_subset = data[data[root_node.attribute] == value]
-        #Remove the Attribute from the list to get Sv
+    for value in attribute_value_dictionary[root_node.attribute]:
+        #get all rows that contain that attribute value
         is_val = data[root_node.attribute] == value
         value_subset = data[is_val]
         #Check to see if Sv is empty
         length = len(value_subset.index)
         if length == 0:
-            return Node(label= Get_Most_Common_Label(data))
+            root_node.next[value] = Node(label= Get_Most_Common_Label(data))
+            # return Node(label= Get_Most_Common_Label(data))
         else:
             new_attributes = attributes[:]
             new_attributes.remove(root_node.attribute)
@@ -174,9 +175,14 @@ def Calculate_Accuracy(root_node, data):
         i += 1
     return wrong_predictions/data.shape[0]
 
+def Populate_Global_Dictionary(data, columns):
+    for column in columns:
+        attribute_value_dictionary[column] = pd.unique(data[column])
+
+
 def Remove_Numeric_Values(data, column_names):
     for column in column_names:
-        if data[column].iloc[0].isnumeric():
+        if data.dtypes[column] == np.int64:
             median_value = np.median(data[column].values)
             i = 0
             while i < len(data[column].values):
@@ -191,31 +197,32 @@ def main():
     tree_depth = int(input())
     print('Please Input how you want to select the attribute. 1=Entropy, 2=Gini, 3=Majority')
     decider = int(input())
+
     #Goal is to use Pandas to generate the table.
-    # car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
     bank_cols = ['age','job','marital','education','default','balance','housing', 'loan', 'contact',
     'day', 'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'label']
-    # q1_cols = ['x1','x2','x3','x4','label']
-    # data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
-    # data = pd.read_csv(r"DecisionTree\test.csv", header=None, names=bank_cols, delimiter=',')
-    data = pd.read_csv(r"DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
-    # data = pd.read_csv(r"DecisionTree\Q1_data.csv", header=None, names=q1_cols, delimiter=',')
+    data = pd.read_csv(r"DecisionTree\bank_files\train.csv", header=None, names=bank_cols, delimiter=',')
+    test_data = pd.read_csv(r"DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
+
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
     total_label_values = data['label'].value_counts()
     total_error = Get_Total_Value(total_label_values, num_rows, decider)
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
     bank_cols.remove('label')
-    # q1_cols.remove('label')
+
+    #we have to populate our global dictionary
+    Populate_Global_Dictionary(data, bank_cols)
 
     #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
     Remove_Numeric_Values(data, bank_cols)
     root_node = Recursive_ID3(data, bank_cols, total_error, tree_depth, decider)
-    # root_node = Recursive_ID3(data, q1_cols, total_error, tree_depth, decider)
 
     #Now that we have the root node, we can calculate the accuracy of the tree
-    error = Calculate_Accuracy(root_node, data)
-    print('program finished with depth of ' + str(tree_depth) + ' and error of ' + str(error))
+    train_error = Calculate_Accuracy(root_node, data)
+    test_error = Calculate_Accuracy(root_node, test_data)
+    print('program finished with depth of ' + str(tree_depth))
+    print('training error = ' + str(train_error) + '  test error = ' + str(test_error))
 
 if __name__ == "__main__":
     main()
