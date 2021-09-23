@@ -174,25 +174,43 @@ def Calculate_Accuracy(root_node, data):
         i += 1
     return wrong_predictions/data.shape[0]
 
+def Remove_Numeric_Values(data, column_names):
+    for column in column_names:
+        if data[column].iloc[0].isnumeric():
+            median_value = np.median(data[column].values)
+            i = 0
+            while i < len(data[column].values):
+                if int(data[column].iloc[i]) < median_value:
+                    data[column].iloc[i] = '-'
+                else:
+                    data[column].iloc[i] = '+'
+                i += 1
+
 def main():
     print('Please Input the Tree Depth')
     tree_depth = int(input())
     print('Please Input how you want to select the attribute. 1=Entropy, 2=Gini, 3=Majority')
     decider = int(input())
     #Goal is to use Pandas to generate the table.
-    car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
+    # car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
+    bank_cols = ['age','job','marital','education','default','balance','housing', 'loan', 'contact',
+    'day', 'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'label']
     # q1_cols = ['x1','x2','x3','x4','label']
     # data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
-    data = pd.read_csv(r"DecisionTree\test.csv", header=None, names=car_cols, delimiter=',')
+    # data = pd.read_csv(r"DecisionTree\test.csv", header=None, names=bank_cols, delimiter=',')
+    data = pd.read_csv(r"DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
     # data = pd.read_csv(r"DecisionTree\Q1_data.csv", header=None, names=q1_cols, delimiter=',')
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
     total_label_values = data['label'].value_counts()
     total_error = Get_Total_Value(total_label_values, num_rows, decider)
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
-    car_cols.remove('label')
+    bank_cols.remove('label')
     # q1_cols.remove('label')
-    root_node = Recursive_ID3(data, car_cols, total_error, tree_depth, decider)
+
+    #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
+    Remove_Numeric_Values(data, bank_cols)
+    root_node = Recursive_ID3(data, bank_cols, total_error, tree_depth, decider)
     # root_node = Recursive_ID3(data, q1_cols, total_error, tree_depth, decider)
 
     #Now that we have the root node, we can calculate the accuracy of the tree
