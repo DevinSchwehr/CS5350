@@ -193,6 +193,15 @@ def Remove_Numeric_Values(data, column_names):
                     data[column].iloc[i] = '+'
                 i += 1
 
+def Remove_Unknown_Values(data, column_names):
+    for column in column_names:
+        if 'unknown' in pd.unique(data[column]):
+            value_counts = data[column].value_counts()
+            value_counts = value_counts.drop(labels=['unknown'])
+            most_common_value = value_counts.idxmax()
+            data[column].replace({'unknown': most_common_value}, inplace=True)
+
+
 def main():
     print('Please Input the Tree Depth')
     tree_depth = int(input())
@@ -208,6 +217,8 @@ def main():
     #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
     Remove_Numeric_Values(data, bank_cols)
     Remove_Numeric_Values(test_data, bank_cols)
+    Remove_Unknown_Values(data, bank_cols)
+    Remove_Unknown_Values(test_data, bank_cols)
 
     #we have to populate our global dictionary
     Populate_Global_Dictionary(data, bank_cols)
