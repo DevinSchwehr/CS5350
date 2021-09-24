@@ -1,6 +1,7 @@
 #Made by Devin Schwehr for CS 5350 Assignment 1
 import numpy as np
 import pandas as pd
+pd.options.mode.chained_assignment = None  # default='warn'
 
 attribute_value_dictionary = {}
 
@@ -204,6 +205,13 @@ def main():
     data = pd.read_csv(r"DecisionTree\bank_files\train.csv", header=None, names=bank_cols, delimiter=',')
     test_data = pd.read_csv(r"DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
 
+    #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
+    Remove_Numeric_Values(data, bank_cols)
+    Remove_Numeric_Values(test_data, bank_cols)
+
+    #we have to populate our global dictionary
+    Populate_Global_Dictionary(data, bank_cols)
+
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
     total_label_values = data['label'].value_counts()
@@ -211,11 +219,6 @@ def main():
     #Now that we have our total entropy, we can begin our recursive method to find the tree.
     bank_cols.remove('label')
 
-    #we have to populate our global dictionary
-    Populate_Global_Dictionary(data, bank_cols)
-
-    #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
-    Remove_Numeric_Values(data, bank_cols)
     root_node = Recursive_ID3(data, bank_cols, total_error, tree_depth, decider)
 
     #Now that we have the root node, we can calculate the accuracy of the tree
