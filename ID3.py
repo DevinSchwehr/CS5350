@@ -187,8 +187,8 @@ def main():
 
     #Goal is to use Pandas to generate the table.
     car_cols = ['buying','maint','doors','persons','lug_boot','safety','label']
-    data = pd.read_csv(r"DecisionTree\train.csv", header=None, names=car_cols, delimiter=',')
-    test_data = pd.read_csv(r"DecisionTree\test.csv", header=None, names=car_cols, delimiter=',')
+    data = pd.read_csv(r"./DecisionTree/train.csv", header=None, names=car_cols, delimiter=',')
+    test_data = pd.read_csv(r"./DecisionTree/test.csv", header=None, names=car_cols, delimiter=',')
 
     # Now that we have a Dataframe, calculate the total entropy
     num_rows = data.shape[0]
