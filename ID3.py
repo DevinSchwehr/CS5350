@@ -154,12 +154,10 @@ def Recursive_ID3(data, attributes, total_entropy, defined_depth, decider):
         length = len(value_subset.index)
         if length == 0:
             root_node.next[value] = Node(label= Get_Most_Common_Label(data))
-            # return Node(label= Get_Most_Common_Label(data))
         else:
             new_attributes = attributes[:]
             new_attributes.remove(root_node.attribute)
             new_depth = defined_depth -1
-            # root_node.next.append(Recursive_ID3(value_subset, new_attributes , new_error, new_depth, decider))
             root_node.next[value] = Recursive_ID3(value_subset,new_attributes, new_error, new_depth, decider)
     return root_node
 
