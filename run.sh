@@ -1,0 +1,1 @@
+python3 ID3-Numerical.py
