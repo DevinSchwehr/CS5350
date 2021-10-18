@@ -7,6 +7,9 @@ attribute_value_dictionary = {}
 example_hits = []
 example_misses = []
 votes = []
+root_nodes = []
+train_hypotheses = []
+test_hypotheses = []
 
 def Get_Num_Values(dataframe, value):
     return dataframe.loc[dataframe['label'] == value].count()
@@ -155,7 +158,8 @@ def Calculate_Accuracies(root_node, data, test_data):
         while current_node.label == None:
             current_node = current_node.next[data[current_node.attribute].iloc[i]]
         if current_node.label != data['label'].iloc[i]:
-            wrong_predictions_weight += data['weight'].iloc[i]
+            # wrong_predictions_weight += data['weight'].iloc[i]
+            wrong_predictions_weight += 1
             example_misses.append(i)
         else:
             example_hits.append(i)    
@@ -167,25 +171,41 @@ def Calculate_Accuracies(root_node, data, test_data):
         while current_node.label == None:
             current_node = current_node.next[test_data[current_node.attribute].iloc[i]]
         if current_node.label != test_data['label'].iloc[i]:
-            test_error += data['weight'].iloc[i]
+            # test_error += data['weight'].iloc[i]
+            test_error += 1
         #     example_misses.append(i)
         # example_hits.append(i)
         i += 1
 
-    return wrong_predictions_weight,test_error
+    # return wrong_predictions_weight,test_error
+    return wrong_predictions_weight/data.shape[0], test_error/test_data.shape[0]
 
-def Calculate_Final_Hypothesis(data,root_node):
+def Calculate_Final_Hypothesis(data,test_data):
     i = 0
-    result = 0
+    train_error = 0
+    test_error = 0
     while i < data.shape[0]:
-        current_node = root_node
-        while current_node.label == None:
-            current_node = current_node.next[data[current_node.attribute].iloc[i]]
-        if current_node.label != data['label'].iloc[i]:
-            result -= 1
-        else:
-            result += 1
-    return result/data.shape[0]
+        training_result = 0
+        j = 0
+        while j < len(votes):
+            current_node = root_nodes[j]
+            while current_node.label == None:
+                current_node = current_node.next[data[current_node.attribute].iloc[i]]
+            if(current_node.label == 'yes'):
+                training_result += votes[j]
+            else:
+                training_result -= votes[j]
+            j += 1
+        training_result = np.sign(training_result)
+        ground_truth = data['label'].iloc[i]
+        if (training_result > 0 and ground_truth == 'no') or (training_result < 0 and ground_truth == 'yes'):
+            train_error += 1
+        ground_truth = test_data['label'].iloc[i]
+        if (training_result > 0 and ground_truth == 'no') or (training_result < 0 and ground_truth == 'yes'):
+            test_error += 1
+        i+= 1
+    return train_error/data.shape[0], test_error/test_data.shape[0]
+    
 
 def Populate_Global_Dictionary(data, columns):
     for column in columns:
@@ -248,6 +268,7 @@ def main():
     error = total_error
     while i <= iterations:
         root_node = Calculate_Stump(data,bank_cols,error)
+        root_nodes.append(root_node)
         #Now that we have the root node, we can calculate the accuracy of the tree
         train_error,test_error = Calculate_Accuracies(root_node, data,test_data)
         # test_error = Calculate_Accuracy(root_node, test_data)
@@ -259,8 +280,8 @@ def main():
         votes.append(vote)
         Adjust_Weight(data,vote)
         #Now, using the stump we calculate the final hypothesis
-        final_hypothesis = Calculate_Final_Hypothesis(data,root_node)
-        print('final hypothesis: ' + str(final_hypothesis))
+        final_train, final_test = Calculate_Final_Hypothesis(data,test_data)
+        print('final training hypothesis: ' + str(final_train) + '  final test hypothesis: ' + str(final_test))
         i+= 1
 
 
