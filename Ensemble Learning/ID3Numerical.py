@@ -209,8 +209,8 @@ def main():
     #Goal is to use Pandas to generate the table.
     bank_cols = ['age','job','marital','education','default','balance','housing', 'loan', 'contact',
     'day', 'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'label']
-    data = pd.read_csv(r"C:\Users\devin\OneDrive\Documents\CS5350\CS5350\DecisionTree\bank_files\train.csv", header=None, names=bank_cols, delimiter=',')
-    test_data = pd.read_csv(r"C:\Users\devin\OneDrive\Documents\CS5350\CS5350\DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
+    data = pd.read_csv(r"./train.csv", header=None, names=bank_cols, delimiter=',')
+    test_data = pd.read_csv(r"./test.csv", header=None, names=bank_cols, delimiter=',')
 
     #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
     Remove_Numeric_Values(data, bank_cols)

@@ -27,6 +27,25 @@ def Gather_Bags(data, bank_cols, total_error):
         print('appended 0th tree to single list')
         iter +=1
 
+def Gather_Bags_Forest(data, bank_cols, total_error, sample_size):
+    iter = 0
+    bagged_dict[101] = []
+    while iter < 5:
+        subdata = data.sample(1000)
+        tree_index = 0
+        tree_list = []
+        print('making trees')
+        while tree_index < 5:
+            root_node = dtf.Recursive_ID3(subdata,bank_cols,total_error,100,1,sample_size)
+            tree_list.append(root_node)
+            tree_index +=1
+        print('made trees')
+        bagged_dict[iter] = tree_list
+        bagged_dict[101].append(bagged_dict[iter][0])
+        print('appended 0th tree to single list')
+        iter +=1
+
+
 def Compute_Information(index,data):
     #First, we have to compute the bias 
     iter = 0
@@ -46,15 +65,15 @@ def Compute_Information(index,data):
             if(current_node.label == 'yes'):
                 total.append(1)
             else:
-                total.append(-1)
+                total.append(0)
             iter +=1
         current_bias = np.sum(total)/100
         if(data['label'].iloc[i] == 'yes'):
             current_bias -= 1
         else:
-            current_bias -= -1
+            current_bias -= 0
         current_bias = np.square(current_bias)
-        current_variance = Calculate_Variance(current_bias,total)
+        current_variance = Calculate_Variance(np.sum(total)/100,total)
         total_variance += current_variance
         total_bias += current_bias
         i += 1
@@ -89,8 +108,8 @@ def main():
     #Goal is to use Pandas to generate the table.
     bank_cols = ['age','job','marital','education','default','balance','housing', 'loan', 'contact',
     'day', 'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'label']
-    data = pd.read_csv(r"C:\Users\devin\OneDrive\Documents\CS5350\CS5350\DecisionTree\bank_files\train.csv", header=None, names=bank_cols, delimiter=',')
-    test_data = pd.read_csv(r"C:\Users\devin\OneDrive\Documents\CS5350\CS5350\DecisionTree\bank_files\test.csv", header=None, names=bank_cols, delimiter=',')
+    data = pd.read_csv(r"./train.csv", header=None, names=bank_cols, delimiter=',')
+    test_data = pd.read_csv(r"./test.csv", header=None, names=bank_cols, delimiter=',')
 
     #Before we can begin the recursive function, we must eliminate numeric values from the Dataframe
     dt.Remove_Numeric_Values(data, bank_cols)
@@ -112,35 +131,51 @@ def main():
     train_error = 0
     test_error = 0
     iterations = 1
-    # while iterations <= 500:
-    #     sample_data = data.sample(n=5000, replace=True)
-    #     root_node = dt.Recursive_ID3(sample_data, bank_cols, total_error, 200, 1)
-    #     train_error += dt.Calculate_Accuracy(root_node, data)
-    #     test_error += dt.Calculate_Accuracy(root_node, test_data)
-    #     print('at ' + str(iterations) + ' iterations: ')
-    #     print('train error = ' + str(train_error/iterations) + '  test error: ' + str(test_error/iterations))
-    #     iterations += 1
-    # Gather_Bags(data,bank_cols,total_error)
-    # single_bias, single_variance = Compute_Information(101,data)
-    # single_squared = single_bias + single_variance
-    # print('Single Tree group bias: ' + str(single_bias) + ' variance: ' + str(single_variance))
-    # print('Single tree group squared ' + str(single_squared))
-    # i = 0
-    # while i < 5:
-    #     bagged_bias, bagged_variance = Compute_Information(i,data)
-    #     bagged_squared = bagged_bias + bagged_variance
-    #     print('Bagged Tree group bias: ' + str(bagged_bias) + ' variance: ' + str(bagged_variance))
-    #     print('Bagged tree group squared ' + str(bagged_squared))
-    #     i+=1
-    
-    #Now to utilize the Random Forests Method
-    part2d = open("part2d.txt", "a")
-    print('for attribute split size of 2')
-    Construct_Forest(data,test_data, bank_cols, total_error, 2,part2d)
-    print('for attribute split size of 4')
-    Construct_Forest(data,test_data, bank_cols, total_error, 4,part2d)
-    print('for attribute split size of 6')
-    Construct_Forest(data,test_data, bank_cols, total_error, 6,part2d)
-    part2d.close()
+    process = input("Please Input The Desired Process\n")
+    if(process == "Bagged Trees"):
+        while iterations <= 500:
+            sample_data = data.sample(n=5000, replace=True)
+            root_node = dt.Recursive_ID3(sample_data, bank_cols, total_error, 200, 1)
+            train_error += dt.Calculate_Accuracy(root_node, data)
+            test_error += dt.Calculate_Accuracy(root_node, test_data)
+            print('at ' + str(iterations) + ' iterations: ')
+            print('train error = ' + str(train_error/iterations) + '  test error: ' + str(test_error/iterations))
+            iterations += 1
+    if(process == "Bagged Trees BV"):
+        Gather_Bags(data,bank_cols,total_error)
+        single_bias, single_variance = Compute_Information(101,data)
+        single_squared = single_bias + single_variance
+        print('Single Tree group bias: ' + str(single_bias) + ' variance: ' + str(single_variance))
+        print('Single tree group squared ' + str(single_squared))
+        i = 0
+        while i < 5:
+            bagged_bias, bagged_variance = Compute_Information(i,data)
+            bagged_squared = bagged_bias + bagged_variance
+            print('Bagged Tree group bias: ' + str(bagged_bias) + ' variance: ' + str(bagged_variance))
+            print('Bagged tree group squared ' + str(bagged_squared))
+            i+=1
+    if(process == "Forest"):
+        split_size = int(input("Please select Attribute Sample Size\n"))
+        #Now to utilize the Random Forests Method
+        part2d = open("part2d.txt", "a")
+        print('for attribute split size of ' + str(split_size))
+        Construct_Forest(data,test_data,bank_cols,total_error,split_size,part2d)
+        part2d.close()
+    if(process == "Forest BV"):
+        split_size = int(input("Please select Attribute Sample Size\n"))
+        Gather_Bags_Forest(data,bank_cols,total_error,split_size)
+        single_bias, single_variance = Compute_Information(101,data)
+        single_squared = single_bias + single_variance
+        print('Single Tree group bias: ' + str(single_bias) + ' variance: ' + str(single_variance))
+        print('Single tree group squared ' + str(single_squared))
+        i = 0
+        while i < 5:
+            bagged_bias, bagged_variance = Compute_Information(i,data)
+            bagged_squared = bagged_bias + bagged_variance
+            print('Bagged Tree group bias: ' + str(bagged_bias) + ' variance: ' + str(bagged_variance))
+            print('Bagged tree group squared ' + str(bagged_squared))
+            i+=1
+
+
 if __name__ == "__main__":
     main()
