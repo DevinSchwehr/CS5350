@@ -17,3 +17,29 @@ type in the number for which one you want to use and press enter.
 
 After a few moments (it can take a few seconds on run-numerical.sh) the program will report that it has finished building the tree for the corresponding depth.
 It will also give you the calculated training error and the calculated test error. 
+
+FOR ASSIGNMENT 2:
+
+There are 2 additional folders: Ensemble Learning and Linear Regression.
+
+In Ensemble Learning are 2 sh files:
+    - run-ada.sh will run the AdaBoost File
+    - run-bagged.sh will run the BaggedTrees File
+
+    For AdaBoost:
+        Specify how many stumps you would like to generate and the program will then output each stump's individual errors as well as the current ensemble's 
+        train and test error.
+
+    For BaggedTrees:
+        There are 4 different Modes you can run the file in:
+            - By inputting 'Bagged Trees' it will create 500 trees and print the average error at each iteration.
+            - By inputting 'Bagged Trees BV' it will perform the process in Problem 2c, namely gathering 100 bags of 100 trees and then computing the bias, variance,
+            and group squared of the single tree's group (the 0th tree from each of the bags) as well as the bias,variance, and group square of each of the bags.
+            - By inputting 'Forest' you will be prompted to input the Attribute Sample Size you want to split the attributes upon. It will then construct 100
+            trees.
+            - By inputting 'Forest BV' you will be prompted to input your Attribute Sample size, at which point it will follow the same process as it does for Bagged Trees BV.
+
+In Linear Regression there is 1 sh file for the Linear-Regression File:
+    - By Inputting 'Batch' it will perform Batch Descent
+    - By Inputting 'Stochastic' it will perform Stochastic Descent
+    It will always output the Analytical optimal weight vector

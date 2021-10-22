@@ -12,12 +12,12 @@ bagged_dict.setdefault(int, [])
 def Gather_Bags(data, bank_cols, total_error):
     iter = 0
     bagged_dict[101] = []
-    while iter < 5:
+    while iter < 100:
         subdata = data.sample(1000)
         tree_index = 0
         tree_list = []
         print('making trees')
-        while tree_index < 5:
+        while tree_index < 100:
             root_node = dt.Recursive_ID3(subdata,bank_cols,total_error,100,1)
             tree_list.append(root_node)
             tree_index +=1
@@ -30,12 +30,12 @@ def Gather_Bags(data, bank_cols, total_error):
 def Gather_Bags_Forest(data, bank_cols, total_error, sample_size):
     iter = 0
     bagged_dict[101] = []
-    while iter < 5:
+    while iter < 100:
         subdata = data.sample(1000)
         tree_index = 0
         tree_list = []
         print('making trees')
-        while tree_index < 5:
+        while tree_index < 100:
             root_node = dtf.Recursive_ID3(subdata,bank_cols,total_error,100,1,sample_size)
             tree_list.append(root_node)
             tree_index +=1
@@ -58,7 +58,7 @@ def Compute_Information(index,data):
     while i < data.shape[0]:
         iter = 0
         total = []
-        while iter < 5:
+        while iter < 100:
             current_node = bagged_dict[index][iter]
             while current_node.label == None:
                 current_node = current_node.next[data[current_node.attribute].iloc[i]]
@@ -84,7 +84,7 @@ def Compute_Information(index,data):
 def Calculate_Variance(mean,predictions):
     iter = 0
     variance = 0
-    while iter < 5:
+    while iter < 100:
         variance += np.square(predictions[0] - mean)
         iter +=1
     return variance/99
@@ -148,7 +148,7 @@ def main():
         print('Single Tree group bias: ' + str(single_bias) + ' variance: ' + str(single_variance))
         print('Single tree group squared ' + str(single_squared))
         i = 0
-        while i < 5:
+        while i < 100:
             bagged_bias, bagged_variance = Compute_Information(i,data)
             bagged_squared = bagged_bias + bagged_variance
             print('Bagged Tree group bias: ' + str(bagged_bias) + ' variance: ' + str(bagged_variance))
@@ -169,7 +169,7 @@ def main():
         print('Single Tree group bias: ' + str(single_bias) + ' variance: ' + str(single_variance))
         print('Single tree group squared ' + str(single_squared))
         i = 0
-        while i < 5:
+        while i < 100:
             bagged_bias, bagged_variance = Compute_Information(i,data)
             bagged_squared = bagged_bias + bagged_variance
             print('Bagged Tree group bias: ' + str(bagged_bias) + ' variance: ' + str(bagged_variance))
