@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn import tree
 from sklearn.ensemble import AdaBoostClassifier
-import sklearn
+from sklearn.linear_model import LinearRegression
 import sklearn.preprocessing as prep
 import csv
 
@@ -42,10 +42,16 @@ def Perform_AdaBoost(encoded_train_data,encoded_test_data,train_labels):
     results = ada.predict(encoded_test_data)
     Write_To_CSV('AdaBoost_Results.csv',results)
 
+def Perform_Linear_Regression(encoded_train_data,encoded_test_data,train_labels):
+    regressor = LinearRegression()
+    regressor.fit(encoded_train_data,train_labels)
+    results = regressor.predict(encoded_test_data)
+    Write_To_CSV('Linear-Regression-Results.csv',results)
+
 def Write_To_CSV(filename, results):
     with open(filename,'w',newline='') as fh:
         writer = csv.writer(fh,delimiter = ',')
-        writer.writerow(['ID','Predictions'])
+        writer.writerow(['ID','Prediction'])
         writer.writerows(enumerate(results,1))
     print("got output for" + filename)
 
@@ -75,7 +81,8 @@ def main():
     encoded_test_data = encoder.transform(test_data)
 
     # Perform_Decision_Tree(dec_tree,encoded_train_data,encoded_test_data,train_labels)
-    Perform_AdaBoost(encoded_train_data,encoded_test_data,train_labels)
+    # Perform_AdaBoost(encoded_train_data,encoded_test_data,train_labels)
+    Perform_Linear_Regression(encoded_train_data,encoded_test_data,train_labels)
 
 if __name__ == "__main__":
     main()
