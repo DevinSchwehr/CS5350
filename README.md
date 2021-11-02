@@ -43,3 +43,9 @@ In Linear Regression there is 1 sh file for the Linear-Regression File:
     - By Inputting 'Batch' it will perform Batch Descent
     - By Inputting 'Stochastic' it will perform Stochastic Descent
     It will always output the Analytical optimal weight vector
+    
+FOR ASSIGNMENT 3:
+
+Perceptron has one sh file, titled 'run-perceptron.sh'
+
+Running it will ask you to input a number that corresponds to each of the respective Perceptron types. Enter in the appropriate number and hit enter to get the desired output from the program.
