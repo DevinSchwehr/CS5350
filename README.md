@@ -59,3 +59,11 @@ Running it asks for you to put in an input that corresponds to each of the diffe
 There is the need for manual changing to get certain outcomes.
     - For Primal, in main you can pick which yt value you want by uncommenting the desired function and commenting out the other.
     - For Gaussian Dual, you need to remove the other C values and decrease the number of iterations to see the # of overlapping support vectors.
+
+FOR ASSIGNMENT 5:
+
+There are two sh files, 'NN.sh' and 'NN_PyTorch.sh'
+
+Running NN.sh will ask you for a desired width. Inputting that will output the training and test error for that width. 
+
+Running NN_PyTorch.sh will run the PyTorch Implementation for all widths. Both versions of activations are initialized to a depth of 3. To add more depths, you will need to copy and paste lines 16 & 17 for ReLu and lines 40 & 41 for Tanh to get the desired depth. Lines 104 & 105 dictate which activation you want to use. 
