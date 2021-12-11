@@ -49,3 +49,13 @@ FOR ASSIGNMENT 3:
 Perceptron has one sh file, titled 'run-perceptron.sh'
 
 Running it will ask you to input a number that corresponds to each of the respective Perceptron types. Enter in the appropriate number and hit enter to get the desired output from the program.
+
+FOR ASSIGNMENT 4:
+
+SVM just has one sh file, titled 'svm.sh'
+
+Running it asks for you to put in an input that corresponds to each of the different implementations. Put in the proper number and hit enter to begin execution.
+
+There is the need for manual changing to get certain outcomes.
+    - For Primal, in main you can pick which yt value you want by uncommenting the desired function and commenting out the other.
+    - For Gaussian Dual, you need to remove the other C values and decrease the number of iterations to see the # of overlapping support vectors.
