@@ -41,18 +41,6 @@ class Neural_Tanh_Network(nn.Module):
             nn.Tanh(),
             nn.Linear(width,width),
             nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
-            nn.Linear(width,width),
-            nn.Tanh(),
             nn.Linear(width,2)
         )
 
