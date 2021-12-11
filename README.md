@@ -67,3 +67,5 @@ There are two sh files, 'NN.sh' and 'NN_PyTorch.sh'
 Running NN.sh will ask you for a desired width. Inputting that will output the training and test error for that width. 
 
 Running NN_PyTorch.sh will run the PyTorch Implementation for all widths. Both versions of activations are initialized to a depth of 3. To add more depths, you will need to copy and paste lines 16 & 17 for ReLu and lines 40 & 41 for Tanh to get the desired depth. Lines 104 & 105 dictate which activation you want to use. 
+
+There is also a file, Prob4.py, that shows the logic for how I calculated the gradients in Problem 4 Part b. 
