@@ -1,3 +1,4 @@
+import os
 from os import write
 import numpy as np
 import pandas as pd
@@ -84,7 +85,8 @@ def Perform_Naive_Bayes(encoded_train_data,encoded_test_data,train_labels):
     Write_To_CSV("Naive_Bayes",results)
 
 def Write_To_CSV(filename, results):
-    with open(filename,'w',newline='') as fh:
+    here = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(here,filename),'w',newline='') as fh:
         writer = csv.writer(fh,delimiter = ',')
         writer.writerow(['ID','Prediction'])
         writer.writerows(enumerate(results,1))
